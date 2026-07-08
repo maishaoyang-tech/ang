@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="--scale: 1.0156;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>百年京张 AI 创新带 · 项目策划清单</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:  #091520;
+  --navy2: #0d1b2a;
+  --gold:  #F5C842;
+  --gold2: #FFD966;
+  --teal:  #7DC0BD;
+  --body:  #BEC9D2;
+  --dim:   #7AABBF;
+  --white: #EDF1F4;
+  --rose:  #E87A69;
+  --blue:  #79A7D8;
+  --violet:#A892EE;
+}
+
+body {
+  background-color: var(--navy);
+  color: var(--body);
+  font-family: 'Inter', "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 骨架与幻灯片核心 */
+#jz-deck {
+  width: 100vw;
+  height: 100vh;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  display: flex;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: auto;
+}
+#jz-deck::-webkit-scrollbar { display: none; }
+
+.jz-slide {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100vh;
+  scroll-snap-align: start;
+  position: relative;
+  overflow: hidden;
+  padding: 4.5vh 4.5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* 全局水印与装饰 */
+.jz-watermark {
+  position: absolute;
+  top: 4.5vh;
+  right: 4.5vw;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(125,192,189, 0.25);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.jz-global-footer {
+  position: absolute;
+  bottom: 2.5vh;
+  left: 4.5vw;
+  right: 4.5vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: rgba(188,201,210,0.3);
+  border-top: 1px solid rgba(188,201,210,0.08);
+  padding-top: 1.2vh;
+  pointer-events: none;
+}
+
+/* 导航与页码 */
+#jz-nav {
+  position: fixed;
+  bottom: 2.3vh;
+  right: 4.5vw;
+  display: flex;
+  gap: 8px;
+  z-index: 999;
+}
+.jz-dot {
+  width: 20px;
+  height: 2px;
+  background: rgba(188,201,210,0.2);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+}
+.jz-dot.on {
+  background: var(--gold);
+  width: 35px;
+}
+
+/* 排版系统 */
+.jz-meta {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--teal);
+  letter-spacing: 0.08em;
+  margin-bottom: 1.5vh;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.jz-meta::after {
+  content: '';
+  flex-grow: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(125,192,189,0.3), transparent);
+}
+h2.jz-title {
+  font-size: calc(24px + 0.8vw);
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.25;
+  margin-bottom: 3vh;
+  letter-spacing: -0.02em;
+}
+h2.jz-title span {
+  color: var(--gold);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 300;
+}
+
+/* 容器与网格 */
+.jz-grid-2 {
+  display: grid;
+  grid-template-columns: 1.1sfr 0.9fr;
+  gap: 4vw;
+  height: 70vh;
+  align-items: start;
+}
+.jz-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5vw;
+  height: 70vh;
+}
+.jz-grid-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+  height: 70vh;
+  justify-content: center;
+}
+
+/* 文本与叙事板 */
+.jz-narrative {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5vh;
+  justify-content: center;
+}
+.jz-lead {
+  font-size: calc(14px + 0.2vw);
+  line-height: 1.6;
+  color: var(--white);
+  text-align: justify;
+}
+.jz-p {
+  font-size: calc(12px + 0.1vw);
+  line-height: 1.65;
+  color: var(--body);
+  text-align: justify;
+}
+
+/* 极客级地图看板专有样式 (Slide 8) */
+.jz-map-dashboard {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  height: 82vh;
+  margin-top: 1vh;
+  position: relative;
+}
+
+/* 左侧控制面板 */
+.jz-control-panel {
+  background: rgba(13, 27, 42, 0.85);
+  border: 1px solid rgba(125, 192, 189, 0.15);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+.jz-panel-header {
+  border-bottom: 1px solid rgba(188, 201, 210, 0.1);
+  padding-bottom: 12px;
+}
+.jz-panel-header h3 {
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.jz-panel-header p {
+  color: var(--dim);
+  font-size: 12px;
+}
+
+/* 交互选项卡 */
+.jz-tabs-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.jz-tab {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(188, 201, 210, 0.08);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.jz-tab:hover {
+  background: rgba(125, 192, 189, 0.05);
+  border-color: rgba(125, 192, 189, 0.3);
+}
+.jz-tab.active {
+  background: linear-gradient(90deg, rgba(125, 192, 189, 0.15), rgba(125, 192, 189, 0.02));
+  border-color: var(--teal);
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+.jz-tab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.jz-tab-title {
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+}
+.jz-tab-desc {
+  color: var(--dim);
+  font-size: 11px;
+}
+.jz-tab-badge {
+  font-size: 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(188, 201, 210, 0.1);
+  color: var(--body);
+}
+.jz-tab.active .jz-tab-badge {
+  background: var(--teal);
+  color: var(--navy);
+}
+
+/* 动态说明文本盒 */
+.jz-text-box-container {
+  flex-grow: 1;
+  position: relative;
+  margin-top: 10px;
+  border-top: 1px solid rgba(188, 201, 210, 0.1);
+  padding-top: 16px;
+}
+.jz-text-box {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--body);
+  text-align: justify;
+}
+.jz-text-box.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.jz-text-box strong {
+  color: var(--gold);
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13.5px;
+}
+
+/* 右侧无级缩放高精画布舱 */
+.jz-map-viewport {
+  background: #050b11;
+  border: 1px solid rgba(188, 201, 210, 0.1);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+}
+.jz-map-viewport:active { cursor: grabbing; }
+
+/* 画布基础 */
+.jz-mapping-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.1s ease-out;
+}
+
+/* 基础底图图层 */
+.jz-layer-basemap {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: opacity 0.5s ease;
+}
+
+/* 动态覆盖图层（叠加在底图之上的高清数据断点图） */
+.jz-layer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  mix-blend-mode: screen; /* 允许高级光效图层完美融合 */
+  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+}
+.jz-layer-overlay.active {
+  opacity: 1;
+}
+
+/* 悬浮技术小部件 */
+.jz-map-widgets {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(9, 21, 32, 0.8);
+  border: 1px solid rgba(125, 192, 189, 0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--teal);
+  backdrop-filter: blur(5px);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* 动画触发基础类 */
+.in .jz-meta::after { width: 100%; transition: width 1.2s ease 0.2s; }
+.in h2.jz-title { opacity: 1; transform: translateY(0); transition: all 0.8s ease 0.1s; }
+</style>
+</head>
+<body>
+
+<div id="jz-deck">
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 01 / Context</div>
+    <div>
+      <div class="jz-meta">PROJECT VISION</div>
+      <h2 class="jz-title">百年京张 <span>AI 创新带</span><br>空间断点织补与城市可行性研究报告</h2>
+    </div>
+    <div class="jz-grid-2">
+      <div class="jz-narrative">
+        <p class="jz-lead">京张铁路见证了中国百年工业文明的跃迁，而今日，AI 浪潮正赋予这条历史走廊全新的科创生命力。</p>
+        <p class="jz-p">本项研究聚焦于高科技创新廊道建设中面临的“空间碎裂化”核心痛点。由于历史铁路割裂、城市干道阻隔及封闭式园区阻断，高智生产要素在流动中遭遇多处物理与感知层面的断点。我们将通过对公园、交通、校园等典型断点的解构，提出立体织补的可行性方案。</p>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.01); border: 1px dashed rgba(188,201,210,0.1); height: 100%; border-radius: 8px;">
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: 72px; color: rgba(245,200,66,0.08);">1909 - 2026</span>
+      </div>
+    </div>
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 01</span></div>
+  </div>
+
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 02 / Analytical Framework</div>
+    <div>
+      <div class="jz-meta">THE MACRO CHALLENGE</div>
+      <h2 class="jz-title">科创走廊的<span>“中梗阻”</span>现象</h2>
+    </div>
+    <div class="jz-grid-3">
+      <div class="jz-narrative" style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 8px; border-top: 2px solid var(--rose);">
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--rose);">01</span>
+        <p class="jz-lead" style="font-size: 16px; margin: 15px 0 10px 0;">物理边界的刚性割裂</p>
+        <p class="jz-p">遗留的铁路路基与城市快速路形成巨大的线形屏障，导致东西两侧在空间上近在咫尺，却需要绕行数公里。科创企业与居民的高频步行交往被彻底阻断。</p>
+      </div>
+      <div class="jz-narrative" style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 8px; border-top: 2px solid var(--teal);">
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--teal);">02</span>
+        <p class="jz-lead" style="font-size: 16px; margin: 15px 0 10px 0;">创新生态的“孤岛效应”</p>
+        <p class="jz-p">各大高校及科研院所采用高墙封闭管理，内部优质的实验、景观和智力资源无法外溢。城市缺乏高效的创新孵化“过渡带”与共享接触面。</p>
+      </div>
+      <div class="jz-narrative" style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 8px; border-top: 2px solid var(--gold);">
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--gold);">03</span>
+        <p class="jz-lead" style="font-size: 16px; margin: 15px 0 10px 0;">慢行系统的体验退化</p>
+        <p class="jz-p">城市绿地、口袋公园由于缺乏系统连续的规划，往往沦为孤立的绿化色块，未能转化为支撑高智群体驻足交流、碰撞灵感的“有温度”的公共节点。</p>
+      </div>
+    </div>
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 02</span></div>
+  </div>
+
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 02 / Analytical Framework</div>
+    <div>
+      <div class="jz-meta">SPATIAL SCOPE</div>
+      <h2 class="jz-title">“一轴、两翼、<span>多节点”</span>的研判视野</h2>
+    </div>
+    <div class="jz-grid-2">
+      <div class="jz-narrative">
+        <p class="jz-p">研究边界以京张遗址公园慢行主轴为核心纽带，向东西两侧辐射拓宽约1.5公里科创过渡带，总覆盖面积达12.8平方公里。沿线密布18所重点高校及近百家主攻通用人工智能、大模型算法的领军企业总部。</p>
+        <p class="jz-p">通过建立多维度的城市空间数据库（包含高德路网拓扑、联通匿名信令热力、以及精细到建筑单体的激光点云模型），课题组对全线实施了全要素数字化扫描。数据揭示出，创新活力的传导并未呈现理想的线性流动，而是被若干离散分布的碎裂化“冷点”严重切断。</p>
+      </div>
+      <div class="jz-narrative" style="border-left: 1px dashed rgba(125,192,189,0.2); padding-left: 3vw;">
+        <div style="margin-bottom: 3vh;">
+          <span style="font-size: 11px; color: var(--teal); font-family: monospace; display: block; margin-bottom: 5px;">// GEOGRAPHIC BOUNDARY</span>
+          <p class="jz-p" style="font-size: 13px; color: var(--white);">北至清华东路，南至西直门枢纽，纵深全长约9.0公里的线性廊道。</p>
+        </div>
+        <div>
+          <span style="font-size: 11px; color: var(--gold); font-family: monospace; display: block; margin-bottom: 5px;">// DATA ARCHITECTURE</span>
+          <p class="jz-p" style="font-size: 13px; color: var(--white);">依托 42 个网格监测点及 3,500 万条轨迹交叉数据，构建空间阻抗矩阵。</p>
+        </div>
+      </div>
+    </div>
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 03</span></div>
+  </div>
+
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 02 / Analytical Framework</div>
+    <div>
+      <div class="jz-meta">QUANTITATIVE MEASUREMENT</div>
+      <h2 class="jz-title">基于可达性矩阵的<span>步行阻抗模型</span></h2>
+    </div>
+    <div class="jz-grid-2">
+      <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+        <p class="jz-lead">定量分析表明，断点区域的“时空扭曲度”极高。空间阻抗系数（Pedestrian Impedance Index）比正常街区高出 3.4 倍。</p>
+        <div style="background: rgba(13, 27, 42, 0.4); padding: 20px; border-radius: 6px; border: 1px solid rgba(188,201,210,0.05);">
+          <span style="font-size: 11px; color: var(--blue); font-family: monospace; display: block; margin-bottom: 10px;">📊 MEASUREMENT MATRIX</span>
+          <p class="jz-p" style="font-size: 12.5px; margin-bottom: 8px;">• <b>基本步行指数 (Walk Score)：</b>核心阻隔带评分仅为 24/100，属于极度不可步行区域。</p>
+          <p class="jz-p" style="font-size: 12.5px; margin-bottom: 8px;">• <b>绕行系数 (Detour Ratio)：</b>实测东西向直线距离 150 米的节点，绕行系数高达 7.2（需折返 1.1 公里）。</p>
+          <p class="jz-p" style="font-size: 12.5px; margin-bottom: 0;">• <b>界面穿透率 (Permeability)：</b>高校及大院边界综合穿透率不足 8.5%，形成实质性的“硬质隔离墙”。</p>
+        </div>
+      </div>
+      <div class="jz-narrative" style="background: rgba(255,255,255,0.01); border: 1px solid rgba(188,201,210,0.05); padding: 30px; border-radius: 8px; height: 100%;">
+        <span style="font-family: 'Cormorant Garamond', serif; font-size: 14px; color: var(--gold); display: block; margin-bottom: 15px;">SPATIAL IMPEDANCE FORMULA</span>
+        <p class="jz-p" style="font-family: monospace; font-size: 13px; color: var(--white); background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px; margin-bottom: 2vh;">W_i = \sum_{j} \exp(-\beta \cdot c_{ij}) \cdot A_j</p>
+        <p class="jz-p" style="font-size: 12px; line-height: 1.6;">在该阻抗重力模型推演中，当 $c_{ij}$ (空间交互成本) 因刚性断点发生离散型阶跃时，两侧创新网络节点的协同效率呈现指数级衰减。这科学地解释了为何两侧科创企业虽空间相邻，却极少发生自发性跨界技术流动的深层原因。</p>
+      </div>
+    </div>
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 04</span></div>
+  </div>
+
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 02 / Analytical Framework</div>
+    <div>
+      <div class="jz-meta">HUMAN DYNAMICS CONTRAST</div>
+      <h2 class="jz-title">热力赤字与<span>高智交往流失</span>评估</h2>
+    </div>
+    <div class="jz-grid-3">
+      <div class="jz-narrative" style="border-right: 1px solid rgba(188,201,210,0.08); padding-right: 2vw;">
+        <span style="font-size: 36px; font-family: 'Cormorant Garamond', serif; color: var(--rose); font-weight: 300;">-68%</span>
+        <p class="jz-lead" style="font-size: 15px; margin: 10px 0;">午间活力洼地</p>
+        <p class="jz-p" style="font-size: 12.5px;">信令数据显示，在工作日 11:30 - 13:30 黄金交往时段，三大断点周边 200 米半径内的动态人群密度出现断崖式坍塌，形成了显著的“热力赤字区”。</p>
+      </div>
+      <div class="jz-narrative" style="border-right: 1px solid rgba(188,201,210,0.08); padding-right: 2vw; padding-left: 1vw;">
+        <span style="font-size: 36px; font-family: 'Cormorant Garamond', serif; color: var(--dim); font-weight: 300;">4.2 min</span>
+        <p class="jz-lead" style="font-size: 15px; margin: 10px 0;">无效驻留驻足衰减</p>
+        <p class="jz-p" style="font-size: 12.5px;">因缺乏高质量的遮蔽设施、休憩节点与视觉焦点，行人在通过上述碎裂空间时的平均驻留时间仅为 4.2 分钟，表现出极强的“行色匆匆”自清洗特征。</p>
+      </div>
+      <div class="jz-narrative" style="padding-left: 1vw;">
+        <span style="font-size: 36px; font-family: 'Cormorant Garamond', serif; color: var(--gold); font-weight: 300;">18.5 万人次</span>
+        <p class="jz-lead" style="font-size: 15px; margin: 10px 0;">周均潜在交往流失</p>
+        <p class="jz-p" style="font-size: 12.5px;">数学模型估算，由于物理隔阂导致的高校学生与大厂研发人员“偶发性碰面与非正式交流”的物理机会，每周净流失达 18.5 万人次，隐性损失不可估量。</p>
+      </div>
+    </div>
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 05</span></div>
+  </div>
+
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 03 / Strategic Intervention</div>
+    <div>
+      <div class="jz-meta">REWEAVING THE URBAN FABRIC</div>
+      <h2 class="jz-title">从“刚性割裂”走向<span>“弹性弥合”</span>的三大范式</h2>
+    </div>
+    <div class="jz-grid-2">
+      <div class="jz-narrative">
+        <p class="jz-lead">针对上述空间沉疴，规划彻底放弃“头痛医头”的传统修补思维，开创性地提出三维一体的“城市无缝织补系统”（Seamless Reweaving System）。</p>
+        <p class="jz-p">我们的核心策略可提炼为三大核心路径：<b>“生态绿毯跨界缝合”</b>——借助立体的连续景观将自然引入碎裂街区；<b>“立体慢行廊道剥离”</b>——通过多层空中栈道与地下通道网络，彻底剥离过境高强度交通对行人尺度的压迫；<b>“软性校城界面渗透”</b>——推动高校围墙进行微观尺度上的重塑，将封闭资产转化为城市的共享活力触媒。</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 15px; justify-content: center;">
+        <div style="background: rgba(125,192,189,0.08); padding: 18px; border-radius: 6px; border-left: 3px solid var(--teal);">
+          <h4 style="color: var(--white); font-size: 14px; margin-bottom: 4px;">策略 I / 景观生态链网（Ecological Chain）</h4>
+          <p class="jz-p" style="font-size: 11.5px; margin: 0;">以绿意为媒介，将原本互不相连的口袋绿地串联为网，打造不间断的生态漫行体验。</p>
+        </div>
+        <div style="background: rgba(121,167,216,0.08); padding: 18px; border-radius: 6px; border-left: 3px solid var(--blue);">
+          <h4 style="color: var(--white); font-size: 14px; margin-bottom: 4px;">策略 II / 立体多维网络（Multi-Level Infrastructure）</h4>
+          <p class="jz-p" style="font-size: 11.5px; margin: 0;">重构垂直空间，建立跨越铁轨和城市快速路的空中连廊与复合立交慢行系统。</p>
+        </div>
+        <div style="background: rgba(245,200,66,0.08); padding: 18px; border-radius: 6px; border-left: 3px solid var(--gold);">
+          <h4 style="color: var(--white); font-size: 14px; margin-bottom: 4px;">策略 III / 活化触媒界面（Catalytic Interface）</h4>
+          <p class="jz-p" style="font-size: 11.5px; margin: 0;">对封闭边界进行功能置换，置入24小时共享创新舱、微型展览馆等混合业态。</p>
+        </div>
+      </div>
+    </div>
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 06</span></div>
+  </div>
+
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 03 / Strategic Intervention</div>
+    <div>
+      <div class="jz-meta">IMPLEMENTATION BLUEPRINT</div>
+      <h2 class="jz-title">织补行动方案<span>项目策划与实施时序</span></h2>
+    </div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid rgba(188,201,210,0.15); color: var(--white);">
+            <th style="padding: 12px 8px; font-weight: 500; width: 10%;">编号</th>
+            <th style="padding: 12px 8px; font-weight: 500; width: 22%;">核心策划项目名称</th>
+            <th style="padding: 12px 8px; font-weight: 500; width: 18%;">对应空间断点</th>
+            <th style="padding: 12px 8px; font-weight: 500; width: 35%;">具体空间织补手段</th>
+            <th style="padding: 12px 8px; font-weight: 500; width: 15%; color: var(--gold);">建设时序</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid rgba(188,201,210,0.05);">
+            <td style="padding: 14px 8px; font-family: monospace; color: var(--teal);">PRJ-01</td>
+            <td style="padding: 14px 8px; color: var(--white); font-weight: 500;">学院路“空中创新悬毯”</td>
+            <td style="padding: 14px 8px;">02 / 交通干道断点</td>
+            <td style="padding: 14px 8px; color: var(--dim);">建设横跨学院路的高架跨街景观廊道，融合慢行与咖啡快闪空间。</td>
+            <td style="padding: 14px 8px; color: var(--gold);">近期 (2026-2027)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(188,201,210,0.05);">
+            <td style="padding: 14px 8px; font-family: monospace; color: var(--teal);">PRJ-02</td>
+            <td style="padding: 14px 8px; color: var(--white); font-weight: 500;">遗址公园“生态缝合绿毯”</td>
+            <td style="padding: 14px 8px;">01 / 公园景观断点</td>
+            <td style="padding: 14px 8px; color: var(--dim);">破除旧铁路边际死角，建设连续式下沉广场与缓坡绿地，缝合两侧步行面。</td>
+            <td style="padding: 14px 8px; color: var(--gold);">近期 (2026-2027)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(188,201,210,0.05);">
+            <td style="padding: 14px 8px; font-family: monospace; color: var(--teal);">PRJ-03</td>
+            <td style="padding: 14px 8px; color: var(--white); font-weight: 500;">高校“软化界面”活力触媒带</td>
+            <td style="padding: 14px 8px;">03 / 校园封闭边界</td>
+            <td style="padding: 14px 8px; color: var(--dim);">在保障校园安全前提下拆墙透绿，置入集装箱式共享路演舱群。</td>
+            <td style="padding: 14px 8px; color: var(--violet);">中期 (2027-2028)</td>
+          </tr>
+          <tr>
+            <td style="padding: 14px 8px; font-family: monospace; color: var(--teal);">PRJ-04</td>
+            <td style="padding: 14px 8px; color: var(--white); font-weight: 500;">立体综合科创“缝合核”建筑</td>
+            <td style="padding: 14px 8px; color: var(--gold);">综合断点复合交织区</td>
+            <td style="padding: 14px 8px; color: var(--dim);">深化下页所述之核心可研建筑方案，构建集交通转换与双创空间于一体的超级节点。</td>
+            <td style="padding: 14px 8px; color: var(--rose);">远期 (2028-2030)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 07</span></div>
+  </div>
+
+  <div class="jz-slide">
+    <div class="jz-watermark">Section 04 / Interactive Dashboard</div>
+    <div>
+      <div class="jz-meta">INTERACTIVE SPATIAL ANALYTICS</div>
+      <h2 class="jz-title">空间断点分布与<span>可研建筑空间落位</span>交互图谱</h2>
+    </div>
+
+    <div class="jz-map-dashboard">
+      <div class="jz-control-panel">
+        <div class="jz-panel-header">
+          <h3>分析控制台</h3>
+          <p>点击下方维度，画布自动无缝叠合高精数据图层，滚轮或拖拽可任意缩放查看细节。</p>
+        </div>
+
+        <div class="jz-tabs-group">
+          <div class="jz-tab active" data-id="1">
+            <div class="jz-tab-info">
+              <span class="jz-tab-title">1. 公园断点现状</span>
+              <span class="jz-tab-desc">生态斑块不连续与步行廊道阻断</span>
+            </div>
+            <span class="jz-tab-badge">PARK</span>
+          </div>
+
+          <div class="jz-tab" data-id="2">
+            <div class="jz-tab-info">
+              <span class="jz-tab-title">2. 交通断点分析</span>
+              <span class="jz-tab-desc">城市快速路引发的步行/骑行割裂</span>
+            </div>
+            <span class="jz-tab-badge">TRAFFIC</span>
+          </div>
+
+          <div class="jz-tab" data-id="3">
+            <div class="jz-tab-info">
+              <span class="jz-tab-title">3. 校园断点研究</span>
+              <span class="jz-tab-desc">封闭大院界面对科创活力的阻隔</span>
+            </div>
+            <span class="jz-tab-badge">CAMPUS</span>
+          </div>
+
+          <div class="jz-tab" data-id="4">
+            <div class="jz-tab-info">
+              <span class="jz-tab-title">4. 可研建筑方案</span>
+              <span class="jz-tab-desc">三维缝合枢纽及功能活化落位</span>
+            </div>
+            <span class="jz-tab-badge">BUILDING</span>
+          </div>
+        </div>
+
+        <div class="jz-text-box-container">
+          <div class="jz-text-box active" id="jz-desc-1">
+            <strong>公园断点缝合要点：</strong>
+            现状公园绿地呈现孤岛化，东侧边缘被铁路线残留阻断。规划建议引入高架生态绿毯，横跨边界，让周边研发人员及居民可无障碍步入公园内部，激活绿色交往空间。
+          </div>
+          <div class="jz-text-box" id="jz-desc-2">
+            <strong>交通断点消解对策：</strong>
+            六环路及城市主干道造成南北向、东西向的强物理阻隔。本研究通过构建多层立体慢行连廊系统，剥离人车冲突，建立地下-地面-地上三位一体的科创步行街区。
+          </div>
+          <div class="jz-text-box" id="jz-desc-3">
+            <strong>校园封闭边界织补：</strong>
+            现状高校墙体连续，隔绝了外部创新社区的联动。方案提出“柔化边界”策略，在特定节段拆墙透绿，并结合口袋公园设置面向社会的联合共享实验室、创业咖啡节点。
+          </div>
+          <div class="jz-text-box" id="jz-desc-4">
+            <strong>可行性研究建筑设计：</strong>
+            作为缝合核的综合体建筑。底层架空作为24小时开放的城市客厅，中层嵌入AI孵化器、共享路演厅，顶层通过天桥直接连接校园和轻轨站点，彻底化断点为“超级节点”。
+          </div>
+        </div>
+      </div>
+
+      <div class="jz-map-viewport" id="jz-drag-viewport">
+        <div class="jz-map-widgets">CANVAS SYSTEM v2.0 // ZOOM: SCROLL // PAN: DRAG</div>
+        
+        <div class="jz-mapping-canvas" id="jz-mapping-canvas">
+          <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWzVlqTcp6T6rfAXD3201M0JN04LLJvwACnSMAAuHecVZBLPJmSRUNqTwE.png" class="jz-layer-basemap" alt="区域现状基础底图">
+          
+          <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWzY9qTcv956ag1NQr05kX78jsiqiGsAAC1SMAAuHecVaSVEFrpVT6jjwE.png" class="jz-layer-overlay active" id="jz-lyr-1" alt="公园断点叠加图层">
+          <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWzYtqTcvjWzQeWXfGVXB0-QLh7rfM7gAC0SMAAuHecVaL7v8PwHtJSDwE.png" class="jz-layer-overlay" id="jz-lyr-2" alt="交通断点叠加图层">
+          <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWzZNqTcwT9p6NO3nmoPIGZ65LoN9NfAAC2SMAAuHecVZUh-XH_lE5DDwE.png" class="jz-layer-overlay" id="jz-lyr-3" alt="校园断点叠加图层">
+          <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWzY1qTcvp8uOL7PUCn_waJXxu_AY_IgAC0yMAAuHecVYURm6Bw_qdyDwE.png" class="jz-layer-overlay" id="jz-lyr-4" alt="可研建筑方案叠加图层">
+        </div>
+      </div>
+    </div>
+
+    <div class="jz-global-footer"><span>BEIJINGZHANG CORRIDOR STUDY</span><span>PAGE 08</span></div>
+  </div>
+</div>
+
+<div id="jz-nav"></div>
+
+<script>
+// 1. 全局幻灯片切换与页码计算控制
+const deck = document.getElementById('jz-deck');
+const slides = Array.from(document.querySelectorAll('.jz-slide'));
+const nav = document.getElementById('jz-nav');
+let active = 0;
+
+slides.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.className = `jz-dot${i===0?' on':''}`;
+  dot.addEventListener('click', () => go(i));
+  nav.appendChild(dot);
+});
+
+const dots = Array.from(nav.children);
+
+function fitSlides() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  const scale = Math.min(ww/1440, wh/900);
+  document.documentElement.style.setProperty('--scale', scale);
+}
+
+function setActive(i) {
+  active = i;
+  dots.forEach((dot, j) => dot.classList.toggle('on', j === i));
+}
+
+function go(i) {
+  slides[i].scrollIntoView({ behavior: 'smooth' });
+}
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in');
+      setActive(slides.indexOf(entry.target));
+    }
+  });
+}, { root: deck, threshold: 0.55 });
+
+slides.forEach(slide => obs.observe(slide));
+window.addEventListener('resize', fitSlides);
+fitSlides();
+setActive(0);
+slides[0].classList.add('in');
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'ArrowDown' || event.key === 'PageDown') go(Math.min(active + 1, slides.length - 1));
+  if (event.key === 'ArrowUp' || event.key === 'PageUp') go(Math.max(active - 1, 0));
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = document.querySelectorAll('.jz-tab');
+  const overlayLayers = {
+    1: document.getElementById('jz-lyr-1'),
+    2: document.getElementById('jz-lyr-2'),
+    3: document.getElementById('jz-lyr-3'),
+    4: document.getElementById('jz-lyr-4')
+  };
+  const textPanels = {
+    1: document.getElementById('jz-desc-1'),
+    2: document.getElementById('jz-desc-2'),
+    3: document.getElementById('jz-desc-3'),
+    4: document.getElementById('jz-desc-4')
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetId = parseInt(tab.getAttribute('data-id'));
+      
+      // 切换Tab高亮
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      // 切换左侧文本说明
+      Object.keys(textPanels).forEach(id => {
+        textPanels[id].classList.toggle('active', parseInt(id) === targetId);
+      });
+
+      // 切换右侧画布上叠加的数据图层
+      Object.keys(overlayLayers).forEach(id => {
+        if (overlayLayers[id]) {
+          overlayLayers[id].classList.toggle('active', parseInt(id) === targetId);
+        }
+      });
+    });
+  });
+
+  // 2. 地图画布缩放、拖拽与超长滚动逻辑
+  const viewport = document.getElementById('jz-drag-viewport');
+  const canvas = document.getElementById('jz-mapping-canvas');
+  
+  let scale = 1;
+  let transformX = 0;
+  let transformY = 0;
+  let isDragging = false;
+  let startX, startY;
+
+  // 滚轮缩放控制
+  viewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = 0.05;
+    if (e.deltaY < 0) {
+      scale = Math.min(scale + zoomFactor, 2.5);
+    } else {
+      scale = Math.max(scale - zoomFactor, 0.5);
+    }
+    updateTransform();
+  }, { passive: false });
+
+  // 鼠标拖拽控制
+  viewport.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX - transformX;
+    startY = e.clientY - transformY;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    transformX = e.clientX - startX;
+    transformY = e.clientY - startY;
+    updateTransform();
+  });
+
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  function updateTransform() {
+    canvas.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+    const widget = document.querySelector('.jz-map-widgets');
+    if (widget) {
+      widget.textContent = `CANVAS SYSTEM v2.0 // ZOOM: ${Math.round(scale * 100)}% // PAN: [${Math.round(transformX)}, ${Math.round(transformY)}]`;
+    }
+  }
+});
+</script>
+</body>
+</html>
