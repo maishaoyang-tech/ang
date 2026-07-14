@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百年京张AI创新带</title>
+    <style>
+        /* ==========================================================================
+           1. 全局样式与重置
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: "Microsoft YaHei", "Arial", sans-serif;
+            font-weight: bold;
+        }
+
+        #app-scaler {
+            position: absolute;
+            width: 1600px;
+            height: 900px;
+            top: 50%;
+            left: 50%;
+            transform-origin: center center;
+            overflow: hidden;
+        }
+
+        .scroller-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        .scroller-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide-section {
+            width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow: hidden;
+            background-color: #000000;
+        }
+
+        /* 2秒完成淡入淡出的循环背景动画 */
+        @keyframes bgFadeLoop {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ==========================================================================
+           2. 严格对标图片的首页与目录排版
+           ========================================================================== */
+        .home-bg-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .home-bg-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+        /* 减缓渐变频率为 2.0秒 丝滑交替循环 */
+        .home-bg-img.layer-2 {
+            animation: bgFadeLoop 2.0s infinite linear;
+        }
+
+        /* 首页文字排版区 */
+        .home-content-area {
+            position: absolute;
+            left: 130px;
+            bottom: 340px;
+            z-index: 5;
+            text-align: left;
+        }
+        .home-date {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .home-main-title {
+            font-size: 64px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        .home-sub-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dddddd;
+            letter-spacing: 1px;
+        }
+
+        /* 目录页：还原图片无框版式 */
+        .img-catalog-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            padding: 100px 130px;
+        }
+
+        /* 错落布局位置调整 */
+        .cat-group-left-1 { position: absolute; left: 130px; top: 320px; }
+        .cat-group-left-2 { position: absolute; left: 130px; top: 520px; }
+        .cat-group-left-3 { position: absolute; left: 130px; top: 690px; }
+        .cat-group-mid-1  { position: absolute; left: 470px; top: 320px; }
+        .cat-group-mid-2  { position: absolute; left: 470px; top: 520px; }
+        .cat-group-right-1 { position: absolute; left: 1130px; top: 690px; }
+
+        /* 大底纹空心字样式与精准定位 */
+        .big-watermark-title {
+            font-size: 78px;
+            font-style: italic;
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
+            letter-spacing: 4px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .wm-position-left {
+            position: absolute;
+            left: 480px;
+            top: 715px;
+        }
+        .wm-position-right {
+            position: absolute;
+            left: 1090px;
+            top: 550px;
+        }
+
+        /* 目录小单块样式 */
+        .img-cat-block {
+            cursor: pointer;
+        }
+        .img-cat-header {
+            font-size: 30px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: baseline;
+        }
+        .img-cat-header .num {
+            font-size: 24px;
+            color: #777777;
+            margin-right: 15px;
+            font-weight: normal;
+        }
+        .img-cat-subs {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-left: 48px;
+        }
+        .img-cat-sub-item {
+            font-size: 15px;
+            color: #8c8c8c;
+            font-weight: normal;
+        }
+        .img-cat-block:hover .img-cat-sub-item {
+            color: #ffffff;
+        }
+
+        /* ==========================================================================
+           3. 模板 B 样式（分析页风格）
+           ========================================================================== */
+        .template-b {
+            display: flex;
+        }
+
+        .left-panel {
+            width: 38%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 80px 60px;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .panel-title-area { margin-bottom: 50px; }
+        .panel-title { font-size: 32px; color: #ffffff; letter-spacing: 1px; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+        
+        .interactive-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px 20px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: left;
+            cursor: pointer;
+            font-family: "Microsoft YaHei", sans-serif;
+            font-weight: bold;
+            transition: all 0.15s ease;
+        }
+        .interactive-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.3); }
+        .interactive-btn.active { color: #000000; background: #ffffff; border-color: #ffffff; }
+
+        .desc-panel { flex: 1; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; }
+        .desc-text { font-size: 15px; color: rgba(255, 255, 255, 0.85); line-height: 1.8; letter-spacing: 0.5px; font-weight: normal; }
+
+        .right-mapping { width: 62%; height: 100%; position: relative; overflow: hidden; background: #000000; }
+        .map-viewport { width: 100%; height: 100%; position: absolute; top: 0; left: 0; cursor: grab; }
+        .map-viewport:active { cursor: grabbing; }
+        .map-transform-layer { position: absolute; transform-origin: 0 0; display: flex; justify-content: center; align-items: center; }
+
+        .layer-img {
+            position: absolute;
+            max-width: none;
+            max-height: none;
+            opacity: 0;
+            transition: opacity 0.15s steps(2, end);
+            pointer-events: none;
+        }
+        .layer-img.active { opacity: 1; pointer-events: auto; }
+
+        /* 页脚及辅助功能组件 */
+        .back-to-home-btn {
+            position: fixed; top: 40px; right: 40px; z-index: 100; background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 20px; font-size: 13px; color: #ffffff;
+            cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+        }
+        .back-to-home-btn:hover { background: #ffffff; color: #000000; }
+
+        .right-nav-dots {
+            position: fixed; right: 40px; top: 50%; transform: translateY(-50%); z-index: 100;
+            display: flex; flex-direction: column; gap: 18px;
+        }
+        .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); cursor: pointer; transition: all 0.2s ease; }
+        .nav-dot.active { background: #ffffff; transform: scale(1.5); }
+
+        .foot-bar {
+            position: absolute; bottom: 40px; left: 130px; right: 130px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 5; pointer-events: none;
+        }
+        
+        /* 针对前五页（首页+目录+前3个分析页）定制的专属左下角样式 */
+        .custom-light-footer {
+            font-family: "Microsoft YaHei Light", "Microsoft YaHei", sans-serif;
+            font-style: italic; 
+            font-size: 13px; 
+            color: #b0b0b0; /* 浅灰色 */
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+
+        /* 后面几页恢复普通正常格式 */
+        .normal-footer {
+            font-family: "Microsoft YaHei", sans-serif;
+            font-size: 14px;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        #preload-buffer { position: absolute; width: 1px; height: 1px; opacity: 0.01; overflow: hidden; bottom: 0; left: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- 预加载缓冲区 -->
+    <div id="preload-buffer">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGK9qVILx7o7HLm31KAvnsW_HZ8QsvgACVScAApZHoFazJfO0eWnSxDwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGlhqVI_oY8WJn6BcvsQAAQhk0z3CNE8AAmwjAAKWR6hWS9ZlxAa8nD08BA.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGl1qVJAa8sO3YVHqP23nX7KrkCNGfQACcSMAApZHqFZ7_5PpPuXMXzwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGTpqVIamY_jWrRDsKPKIv_FakH_yAgAC8ScAApZHoFY0wm2S3SNNYDwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGTxqVIas8lz_-eby7uq4FUdc509-wAAC8ycAApZHoFZW9zKQsAABsI88BA.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGl9qVJAqaY1G_5bIx4yXmcYRl6wwgQACcyMAApZHqFbAYFs3WV_uPDwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGmFqVJAwduEKS9R61VEH0UMJLYVOrQACdSMAApZHqFa0KOJoxsYLzjwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGmJqVJAyjbTGXloffEqtAUpB27RJTwACdiMAApZHqFY4TjXtbxkhyjwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGnpqVJDVJxlfNGyayzcOl_PUdcNZmwACjiMAApZHqFZy5PnNBSv8XzwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGntqVJDY2fPsMpfRDUlAwJzLDC4P0AACjyMAApZHqFbxgeW6X8X5szwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGnxqVJDbZqb6cly4SH7EpCJAD9f64AACkCMAApZHqFZS4jCRVvs8NDwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGn1qVJDeCbCgi3BxCbzKyuH4e6zkEgACkSMAApZHqFbhqchRXQftJjwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGn5qVJDhJkRKyzcPdO63qMWhXVKEXwACkiMAApZHqFb2ZYULdJlnyjwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGqxqVJIOPM4fCaGKPA5-RtBfFOqb1AACwSMAApZHqFa_quP7KQF8EjwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGrZqVJJnVtNUfM4g9DdmZOANdqVL2QACyyMAApZHqFat8k6KdP1vVDwE.png" loading="eager">
+        <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGrlqVJJwggVe1s77b4dec-6fVwW1qwACzyMAApZHqFaRMaj6Mrm0MDwE.png" loading="eager">
+    </div>
+
+    <div id="app-scaler">
+        <div class="back-to-home-btn" onclick="scrollToPage(0)">回到首页</div>
+
+        <!-- 8页垂直导航 -->
+        <div class="right-nav-dots" id="rightNavDots">
+            <div class="nav-dot active" onclick="scrollToPage(0)"></div>
+            <div class="nav-dot" onclick="scrollToPage(1)"></div>
+            <div class="nav-dot" onclick="scrollToPage(2)"></div>
+            <div class="nav-dot" onclick="scrollToPage(3)"></div>
+            <div class="nav-dot" onclick="scrollToPage(4)"></div>
+            <div class="nav-dot" onclick="scrollToPage(5)"></div>
+            <div class="nav-dot" onclick="scrollToPage(6)"></div>
+            <div class="nav-dot" onclick="scrollToPage(7)"></div>
+        </div>
+
+        <div class="scroller-container" id="mainScroller">
+
+            <!-- ==========================================
+               Slide00: 首页 (第1页)
+               ========================================== -->
+            <section class="slide-section" id="slide00">
+                <div class="home-bg-wrapper">
+                    <div class="home-bg-img" style="background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGK9qVILx7o7HLm31KAvnsW_HZ8QsvgACVScAApZHoFazJfO0eWnSxDwE.png');"></div>
+                    <div class="home-bg-img layer-2" style="background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGlhqVI_oY8WJn6BcvsQAAQhk0z3CNE8AAmwjAAKWR6hWS9ZlxAa8nD08BA.png');"></div>
+                </div>
+                
+                <div class="home-content-area">
+                    <div class="home-date">2026/07</div>
+                    <div class="home-main-title">百年京张AI创新带</div>
+                    <div class="home-sub-title">城市设计国际方案征集</div>
+                </div>
+
+                <div class="foot-bar">
+                    <!-- 第1页：斜体小号微软雅黑Light 浅灰色 -->
+                    <div class="custom-light-footer">百年京张AI创新带  TEKUMA</div>
+                </div>
+            </section>
+
+            <!-- ==========================================
+               Slide01: 目录 (第2页)
+               ========================================== -->
+            <section class="slide-section" id="slide01">
+                <div class="home-bg-wrapper">
+                    <div class="home-bg-img" style="background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGK9qVILx7o7HLm31KAvnsW_HZ8QsvgACVScAApZHoFazJfO0eWnSxDwE.png');"></div>
+                    <div class="home-bg-img layer-2" style="background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGlhqVI_oY8WJn6BcvsQAAQhk0z3CNE8AAmwjAAKWR6hWS9ZlxAa8nD08BA.png');"></div>
+                </div>
+
+                <!-- 补全的大底纹空心字 -->
+                <div class="big-watermark-title wm-position-left">现状概况</div>
+                <div class="big-watermark-title wm-position-right">概念规划</div>
+
+                <div class="img-catalog-container">
+                    
+                    <!-- 01 设计研究范围 -->
+                    <div class="img-cat-block cat-group-left-1" onclick="scrollToPage(2)">
+                        <div class="img-cat-header"><span class="num">01</span>设计研究范围</div>
+                        <div class="img-cat-subs">
+                            <span class="img-cat-sub-item">01-1 统筹研究范围</span>
+                            <span class="img-cat-sub-item">01-2 总体研究范围</span>
+                            <span class="img-cat-sub-item">01-3 重点设计范围</span>
+                        </div>
+                    </div>
+
+                    <!-- 02 现状建筑更新 -->
+                    <div class="img-cat-block cat-group-left-2" onclick="scrollToPage(3)">
+                        <div class="img-cat-header"><span class="num">02</span>现状建筑更新</div>
+                        <div class="img-cat-subs">
+                            <span class="img-cat-sub-item">02-1 建议拆除建筑</span>
+                            <span class="img-cat-sub-item">02-2 建议保留建筑</span>
+                            <span class="img-cat-sub-item">02-3 建议改造建筑</span>
+                        </div>
+                    </div>
+
+                    <!-- 03 校城融合研究 -->
+                    <div class="img-cat-block cat-group-left-3" onclick="scrollToPage(4)">
+                        <div class="img-cat-header"><span class="num">03</span>校城融合研究</div>
+                        <div class="img-cat-subs">
+                            <span class="img-cat-sub-item">03-1 高校入口及围墙</span>
+                            <span class="img-cat-sub-item">03-2 周边高校及围墙</span>
+                        </div>
+                    </div>
+
+                    <!-- 04 公园交通断点 -->
+                    <div class="img-cat-block cat-group-mid-1" onclick="scrollToPage(5)">
+                        <div class="img-cat-header"><span class="num">04</span>公园交通断点</div>
+                        <div class="img-cat-subs">
+                            <span class="img-cat-sub-item">04-1 公园绿地断点</span>
+                            <span class="img-cat-sub-item">04-1 道路交通断点</span>
+                        </div>
+                    </div>
+
+                    <!-- 05 13号线沿线分析 -->
+                    <div class="img-cat-block cat-group-mid-2" onclick="scrollToPage(6)">
+                        <div class="img-cat-header"><span class="num">05</span>13号线沿线分析</div>
+                        <div class="img-cat-subs">
+                            <span class="img-cat-sub-item">05-1 十三号线断点</span>
+                            <span class="img-cat-sub-item">05-2 轨道站断点</span>
+                        </div>
+                    </div>
+
+                    <!-- 空间策划研究 (无06前缀，独立章节样式) -->
+                    <div class="img-cat-block cat-group-right-1" onclick="scrollToPage(7)">
+                        <div class="img-cat-header">空间策划研究</div>
+                        <div class="img-cat-subs">
+                            <span class="img-cat-sub-item">06-1 空间结构</span>
+                            <span class="img-cat-sub-item">06-2 空间场景</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="foot-bar">
+                    <!-- 第2页：斜体小号微软雅黑Light 浅灰色 -->
+                    <div class="custom-light-footer">百年京张AI创新带  TEKUMA</div>
+                </div>
+            </section>
+
+            <!-- Slide02: 研究范围 (第3页) -->
+            <section class="slide-section template-b" id="slide02">
+                <div class="left-panel">
+                    <div class="panel-title-area"><div class="panel-title">设计研究范围</div></div>
+                    <div class="btn-group">
+                        <div class="interactive-btn active" onclick="switchLayer(this, 's02-l1', 's02-t1')">统筹研究范围</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's02-l2', 's02-t2')">总体研究范围</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's02-l3', 's02-t3')">重点设计范围</div>
+                    </div>
+                    <div class="desc-panel"><div class="desc-text" id="s02-text">统筹研究范围：划定项目全域统筹边界，框定整体研究片区，明确规划外拓管控范围。</div></div>
+                </div>
+                <div class="right-mapping">
+                    <div class="map-viewport">
+                        <div class="map-transform-layer">
+                            <img class="layer-img active" id="s02-l1" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGl1qVJAa8sO3YVHqP23nX7KrkCNGfQACcSMAApZHqFZ7_5PpPuXMXzwE.png">
+                            <img class="layer-img" id="s02-l2" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGTpqVIamY_jWrRDsKPKIv_FakH_yAgAC8ScAApZHoFY0wm2S3SNNYDwE.png">
+                            <img class="layer-img" id="s02-l3" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGTxqVIas8lz_-eby7uq4FUdc509-wAAC8ycAApZHoFZW9zKQsAABsI88BA.png">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none;">
+                    <div id="s02-t1">统筹研究范围：划定项目全域统筹边界，框定整体研究片区，明确规划外拓管控范围。</div>
+                    <div id="s02-t2">总体研究范围：梳理核心开发组团边界，划分片区整体功能基底，作为全部策划空间载体。</div>
+                    <div id="s02-t3">重点设计范围：筛选可落地更新地块、核心创新廊道，为重点项目提供精准空间范围。</div>
+                </div>
+                <div class="foot-bar">
+                    <!-- 第3页：斜体小号微软雅黑Light 浅灰色 -->
+                    <div class="custom-light-footer">百年京张AI创新带  TEKUMA</div>
+                </div>
+            </section>
+
+            <!-- Slide03: 现状建筑更新 (第4页) -->
+            <section class="slide-section template-b" id="slide03">
+                <div class="left-panel">
+                    <div class="panel-title-area"><div class="panel-title">现状建筑更新</div></div>
+                    <div class="btn-group">
+                        <div class="interactive-btn active" onclick="switchLayer(this, 's03-l1', 's03-t1')">建议拆除建筑</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's03-l2', 's03-t2')">建议保留建筑</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's03-l3', 's03-t3')">建议改造建筑</div>
+                    </div>
+                    <div class="desc-panel"><div class="desc-text" id="s03-text">建议拆除建筑：众智园、五道口、大钟寺片区低效老旧存量，释放AI创新开发空间。</div></div>
+                </div>
+                <div class="right-mapping">
+                    <div class="map-viewport">
+                        <div class="map-transform-layer">
+                            <img class="layer-img active" id="s03-l1" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGl9qVJAqaY1G_5bIx4yXmcYRl6wwgQACcyMAApZHqFbAYFs3WV_uPDwE.png">
+                            <img class="layer-img" id="s03-l2" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGmFqVJAwduEKS9R61VEH0UMJLYVOrQACdSMAApZHqFa0KOJoxsYLzjwE.png">
+                            <img class="layer-img" id="s03-l3" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGmJqVJAyjbTGXloffEqtAUpB27RJTwACdiMAApZHqFY4TjXtbxkhyjwE.png">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none;">
+                    <div id="s03-t1">建议拆除建筑：众智园、五道口、大钟寺片区低效老旧存量，释放AI创新开发空间。</div>
+                    <div id="s03-t2">建议保留建筑：现状优质产业、居住楼宇，保留现状使用功能，仅做外立面微更新。</div>
+                    <div id="s03-t3">建议改造建筑：中间过渡类建筑，内部空间重构适配AI办公、展示配套功能。</div>
+                </div>
+                <div class="foot-bar">
+                    <!-- 第4页：斜体小号微软雅黑Light 浅灰色 -->
+                    <div class="custom-light-footer">百年京张AI创新带  TEKUMA</div>
+                </div>
+            </section>
+
+            <!-- Slide04: 校城融合研究 (第5页) -->
+            <section class="slide-section template-b" id="slide04">
+                <div class="left-panel">
+                    <div class="panel-title-area"><div class="panel-title">校城融合研究</div></div>
+                    <div class="btn-group">
+                        <div class="interactive-btn active" onclick="switchLayer(this, 's04-l1', 's04-t1')">高校入口及围墙</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's04-l2', 's04-t2')">周边高校及围墙</div>
+                    </div>
+                    <div class="desc-panel"><div class="desc-text" id="s04-text">高校入口及围墙：梳理沿线各大高校出入口、围墙阻隔断点，打通校城慢行连通通道。</div></div>
+                </div>
+                <div class="right-mapping">
+                    <div class="map-viewport">
+                        <div class="map-transform-layer">
+                            <img class="layer-img active" id="s04-l1" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGnpqVJDVJxlfNGyayzcOl_PUdcNZmwACjiMAApZHqFZy5PnNBSv8XzwE.png">
+                            <img class="layer-img" id="s04-l2" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGntqVJDY2fPsMpfRDUlAwJzLDC4P0AACjyMAApZHqFbxgeW6X8X5szwE.png">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none;">
+                    <div id="s04-t1">高校入口及围墙：梳理沿线各大高校出入口、围墙阻隔断点，打通校城慢行连通通道。</div>
+                    <div id="s04-t2">周边高校及围墙：全域高校分布梳理，统筹高校资源与产业空间联动布局。</div>
+                </div>
+                <div class="foot-bar">
+                    <!-- 第5页（前五页的最后一页）：斜体小号微软雅黑Light 浅灰色 -->
+                    <div class="custom-light-footer">百年京张AI创新带  TEKUMA</div>
+                </div>
+            </section>
+
+            <!-- Slide05: 公园交通断点 (第6页) -->
+            <section class="slide-section template-b" id="slide05">
+                <div class="left-panel">
+                    <div class="panel-title-area"><div class="panel-title">公园交通断点</div></div>
+                    <div class="btn-group">
+                        <div class="interactive-btn active" onclick="switchLayer(this, 's05-l1', 's05-t1')">公园绿地断点</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's05-l2', 's05-t2')">道路交通断点</div>
+                    </div>
+                    <div class="desc-panel"><div class="desc-text" id="s05-text">公园绿地断点：识别滨水公园、城市绿地被道路、铁路割裂点位，优化连续生态廊道。</div></div>
+                </div>
+                <div class="right-mapping">
+                    <div class="map-viewport">
+                        <div class="map-transform-layer">
+                            <img class="layer-img active" id="s05-l1" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGnxqVJDbZqb6cly4SH7EpCJAD9f64AACkCMAApZHqFZS4jCRVvs8NDwE.png">
+                            <img class="layer-img" id="s05-l2" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGn1qVJDeCbCgi3BxCbzKyuH4e6zkEgACkSMAApZHqFbhqchRXQftJjwE.png">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none;">
+                    <div id="s05-t1">公园绿地断点：识别滨水公园、城市绿地被道路、铁路割裂点位，优化连续生态廊道。</div>
+                    <div id="s05-t2">道路交通断点：主干道、交叉口拥堵、慢行断裂节点，梳理通勤优化改造点位。</div>
+                </div>
+                <div class="foot-bar"><div class="normal-footer">百年京张AI创新带  TEKUMA</div></div>
+            </section>
+
+            <!-- Slide06: 13号线沿线分析 (第7页) -->
+            <section class="slide-section template-b" id="slide06">
+                <div class="left-panel">
+                    <div class="panel-title-area"><div class="panel-title">13号线沿线分析</div></div>
+                    <div class="btn-group">
+                        <div class="interactive-btn active" onclick="switchLayer(this, 's06-l1', 's06-t1')">十三号线断点</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's06-l2', 's06-t2')">轨道站断点</div>
+                    </div>
+                    <div class="desc-panel"><div class="desc-text" id="s06-text">十三号线断点：轨道全线地面分割、出入口缺失、慢行衔接断裂全部点位。</div></div>
+                </div>
+                <div class="right-mapping">
+                    <div class="map-viewport">
+                        <div class="map-transform-layer">
+                            <img class="layer-img active" id="s06-l1" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGn5qVJDhJkRKyzcPdO63qMWhXVKEXwACkiMAApZHqFb2ZYULdJlnyjwE.png">
+                            <img class="layer-img" id="s06-l2" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXGqxqVJIOPM4fCaGKPA5-RtBfFOqb1AACwSMAApZHqFa_quP7KQF8EjwE.png">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none;">
+                    <div id="s06-t1">十三号线断点：轨道全线地面分割、出入口缺失、慢行衔接断裂全部点位。</div>
+                    <div id="s06-t2">轨道站断点：各地铁站TOD界面缺失、人车混行、配套不足问题区域。</div>
+                </div>
+                <div class="foot-bar"><div class="normal-footer">百年京张AI创新带  TEKUMA</div></div>
+            </section>
+
+            <!-- Slide07: 空间策划研究 (第8页) -->
+            <section class="slide-section template-b" id="slide07">
+                <div class="left-panel">
+                    <div class="panel-title-area"><div class="panel-title">空间策划研究</div></div>
+                    <div class="btn-group">
+                        <div class="interactive-btn active" onclick="switchLayer(this, 's07-l1', 's07-t1')">空间结构</div>
+                        <div class="interactive-btn" onclick="switchLayer(this, 's07-l2', 's07-t2')">空间场景</div>
+                    </div>
+                    <div class="desc-panel"><div class="desc-text" id="s07-text">空间结构：搭建整体一核多廊空间发展骨架，串联各大创新片区。</div></div>
+                </div>
+                <div class="right-mapping">
+                    <div class="map-viewport">
+                        <div class="map-transform-layer">
+                            <!-- 空间结构最新链接 -->
+                            <img class="layer-img active" id="s07-l1" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXKXdqVa19CetXdpQmhkhxwUQa3CEYagACYCQAAkvwsVajm9LG4MT8fj0E.jpg">
+                            <!-- 空间场景最新链接 -->
+                            <img class="layer-img" id="s07-l2" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXKXpqVa2Ffon4MiG6KcWOJ-5l4vXQlAACZCQAAkvwsVZ_wvncKh0mGz0E.jpg">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none;">
+                    <div id="s07-t1">空间结构：搭建整体一核多廊空间发展骨架，串联各大创新片区。</div>
+                    <div id="s07-t2">空间场景：落地AI产业、人才居住、公共配套三类典型空间场景布局。</div>
+                </div>
+                <div class="foot-bar"><div class="normal-footer">百年京张AI创新带  TEKUMA</div></div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       4. 脚本逻辑
+       ========================================================================== -->
+    <script>
+        // 等比例缩放计算
+        const baseWidth = 1600; const baseHeight = 900; const scaler = document.getElementById('app-scaler');
+        function resizeApp() {
+            const finalScale = Math.min(window.innerWidth / baseWidth, window.innerHeight / baseHeight);
+            scaler.style.transform = `scale(${finalScale}) translate(-50%, -50%)`;
+        }
+        window.addEventListener('resize', resizeApp); resizeApp();
+
+        // 全屏垂直吸附滚动控制
+        const scroller = document.getElementById('mainScroller'); const sections = document.querySelectorAll('.slide-section'); const dots = document.querySelectorAll('.nav-dot');
+        let isScrolling = false; let currentPageIndex = 0;
+
+        function updateNavigation(index) {
+            dots.forEach(dot => dot.classList.remove('active')); if(dots[index]) dots[index].classList.add('active');
+            currentPageIndex = index;
+        }
+
+        function scrollToPage(index) {
+            if (index < 0 || index >= sections.length) return;
+            isScrolling = true; sections[index].scrollIntoView({ behavior: 'smooth' });
+            updateNavigation(index); setTimeout(() => { isScrolling = false; }, 400);
+        }
+
+        scroller.addEventListener('scroll', () => {
+            if (isScrolling) return;
+            const index = Math.round(scroller.scrollTop / 900);
+            if (index !== currentPageIndex && index >= 0 && index < sections.length) { updateNavigation(index); }
+        });
+
+        // 分析页内部互动切换
+        function switchLayer(btn, layerId, textId) {
+            const btnGroup = btn.parentElement; btnGroup.querySelectorAll('.interactive-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+            const section = btn.closest('.slide-section'); section.querySelectorAll('.layer-img').forEach(img => img.classList.remove('active'));
+            const targetLayer = document.getElementById(layerId); if(targetLayer) targetLayer.classList.add('active');
+            const textSource = document.getElementById(textId); const textContainer = btnGroup.nextElementSibling.querySelector('.desc-text');
+            if(textSource && textContainer) { textContainer.innerText = textSource.innerText; }
+        }
+
+        // 视口内的地图平移与滚轮缩放机制
+        document.querySelectorAll('.map-viewport').forEach(viewport => {
+            const transformLayer = viewport.querySelector('.map-transform-layer');
+            let scale = 0.55; let posX = (990 - (1600 * scale)) / 2; let posY = (900 - (1600 * scale)) / 2;
+            let isDragging = false; let startX, startY;
+            function applyTransform() { transformLayer.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`; }
+            applyTransform();
+
+            viewport.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX - posX; startY = e.clientY - posY; });
+            window.addEventListener('mousemove', (e) => { if (!isDragging) return; posX = e.clientX - startX; posY = e.clientY - startY; applyTransform(); });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            viewport.addEventListener('wheel', (e) => {
+                e.preventDefault(); const rect = viewport.getBoundingClientRect(); const mouseX = e.clientX - rect.left; const mouseY = e.clientY - rect.top;
+                const mapX = (mouseX - posX) / scale; const mapY = (mouseY - posY) / scale;
+                if (e.deltaY < 0) { scale = Math.min(scale * 1.08, 1.2); } else { scale = Math.max(scale / 1.08, 0.35); }
+                posX = mouseX - mapX * scale; posY = mouseY - mapY * scale; applyTransform();
+            }, { passive: false });
+        });
+    </script>
+</body>
+</html>
